@@ -4,9 +4,18 @@ import joblib
 from datetime import datetime, timedelta
 import holidays
 import pandas as pd
+from fastapi.middleware.cors import CORSMiddleware
 import numpy as np
 
 app = FastAPI()
+
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=["*"],
+  allow_credentials=True,
+  allow_methods=["*"],
+  allow_headers=["*"],
+)
 
 class items(BaseModel):
   Fecha_inicio: str
