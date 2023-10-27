@@ -4,6 +4,7 @@ import joblib
 from datetime import datetime, timedelta
 import holidays
 import pandas as pd
+import numpy as np
 
 app = FastAPI()
 
@@ -43,9 +44,32 @@ def predecir_valor(fecha):
   return {"Cantidad de accidentes": int(prediccion), "Dia": dia, "Mes": mes, "Semana":semana}
 
 
-def computacion_valores(arr):
-  print(arr)
+def computacion_valores(arr, tipo):
+  if tipo == 'dia':
+    return {f'{arr["Dia"]}-{arr["Mes"]}': arr["Cantidad de accidentes"] for arr in arr}
+  
+  elif tipo == 'semana':
+    dict_semana = {}
+    for i in arr:
+      semana = i['Semana']
+      if semana not in dict_semana:
+        dict_semana[i['Semana']] = {
+          "Total accidentes": 0
+        }
+      dict_semana[semana]['Total accidentes'] += i['Cantidad de accidentes']
+    return dict_semana
+  elif tipo == 'mes':
+    dict_mes = {}
+    for i in arr:
+      mes = i['Mes']
+      if mes not in dict_mes:
+        dict_mes[i['Mes']] = {
+          "Total accidentes": 0
+        }
+      dict_mes[mes]['Total accidentes'] += i['Cantidad de accidentes']
+    return dict_mes
 
+    
 with open('modelo.pkl', 'rb') as file:
     model = joblib.load(file)
 
@@ -58,4 +82,4 @@ async def endpoint(item: items):
   for i in fechas:
     array_predicciones.append(predecir_valor(i))
   valores = computacion_valores(array_predicciones, item['Tipo'])
-  return {"PREDICCION": array_predicciones}
+  return {"Respuesta": valores}
