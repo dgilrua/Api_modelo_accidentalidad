@@ -38,15 +38,23 @@ def predecir_valor(fecha):
   dia = fecha.day
   mes = fecha.month
   semana = fecha.isocalendar()[1]
-  tipo = 0 if fecha.weekday() in [0,1,2,3,4] else 1
-  festivo = 1 if fecha in holidays.country_holidays('CO', years=[fecha.year]) or f'{dia}/{mes}' in ["31/12", "24/12", "31/10", "16/9", "7/12"] else 0
-  
+  tipo = 1 if fecha.weekday() in [0,1,2,3,4] else 0
+  festivo = 0 if fecha in holidays.country_holidays('CO', years=[fecha.year]) or f'{dia}/{mes}' in ["31/12", "24/12", "31/10", "16/9", "7/12"] else 1
+  dict_dia_semana = {
+    0: 2,
+    1: 3,
+    2: 4,
+    3: 1,
+    4: 6,
+    5: 5,
+    6: 0
+  }
   predict_data = {
     'DIA': [dia],
     'MES': [mes],
     'SEMANA': [semana],
     'FECHA_FESTIVA': [festivo],
-    'DIA_SEMANA': [fecha.weekday()],
+    'DIA_SEMANA': dict_dia_semana[fecha.weekday()],
     'TIPO_DIA': [tipo]
   }
   prediccion = model.predict(pd.DataFrame(predict_data))[0]
